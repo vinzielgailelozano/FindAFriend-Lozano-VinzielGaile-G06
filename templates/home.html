@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block body_class %}page-home{% endblock %}
+{% block content %}
+  {# Logged-in users visiting "/" get a shortcut to their dashboard #}
+  <section class="card">
+    <h1>Welcome back!</h1>
+    <p>Head to your dashboard to continue.</p>
+    <a class="btn btn-primary" href="{% url 'dashboard:home' %}">Go to dashboard</a>
+  </section>
+{% endblock %}
+{% block public_content %}
+  <section class="hero">
+    <div class="hero-text">
+      <p class="eyebrow">For students, by students</p>
+      <h1>Find new friends<br>around campus.</h1>
+      <p class="lead">Irregular, transferee, shiftee or just in a new section? FindAFriend connects you with classmates who share your subjects, schedule and interests.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}">Create a free account</a>
+        <a class="btn btn-ghost btn-lg" href="{% url 'accounts:login' %}">I already have one</a>
+      </div>
+    </div>
+    <div class="bubbles" aria-hidden="true">
+      <span class="bubble b1">study buddy?</span>
+      <span class="bubble b2">same section!</span>
+      <span class="bubble b3">lunch at 12?</span>
+      <span class="bubble b4">badminton ✦ anime ✦ coding</span>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature"><h3>Match by interests</h3><p>Hobbies, subjects, course and year level.</p></div>
+    <div class="feature"><h3>Find classmates</h3><p>See who shares your subjects and section.</p></div>
+    <div class="feature"><h3>Stay safe</h3><p>Campus-only, with blocking and reporting.</p></div>
+  </section>
+{% endblock %}
