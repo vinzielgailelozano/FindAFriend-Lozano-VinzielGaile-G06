@@ -1,0 +1,77 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}FindAFriend{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+{% if user.is_authenticated %}
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="{% url 'dashboard:home' %}">
+        <span class="logo" aria-hidden="true"></span>
+        <span>FindAFriend<br><small>Around campus</small></span>
+      </a>
+
+      <span class="role-chip role-{{ user.role|lower }}">{{ user.get_role_display }}</span>
+
+      <nav class="nav">
+        {% with url_name=request.resolver_match.url_name %}
+        {% if user.role == "ADMIN" %}
+          <a href="{% url 'dashboard:admin' %}" class="{% if url_name == 'admin' %}active{% endif %}">Dashboard</a>
+          <a href="{% url 'dashboard:user_list' %}" class="{% if url_name == 'user_list' %}active{% endif %}">Users</a>
+          <span class="nav-soon">Reports <em>soon</em></span>
+          <span class="nav-soon">Moderation <em>soon</em></span>
+          <a href="{% url 'admin:index' %}">Django Admin</a>
+        {% else %}
+          <a href="{% url 'dashboard:student' %}" class="{% if url_name == 'student' %}active{% endif %}">Dashboard</a>
+          <span class="nav-soon">Find Friends <em>soon</em></span>
+          <span class="nav-soon">Friend Requests <em>soon</em></span>
+          <span class="nav-soon">Messages <em>soon</em></span>
+          <span class="nav-soon">Groups <em>soon</em></span>
+        {% endif %}
+        <a href="{% url 'accounts:profile' %}" class="{% if url_name == 'profile' or url_name == 'profile_edit' or url_name == 'password_change' %}active{% endif %}">My Profile</a>
+        {% endwith %}
+      </nav>
+
+      <div class="sidebar-user">
+        {% include "accounts/_avatar.html" with u=user size="sm" %}
+        <div>
+          <strong>{{ user.get_full_name|default:user.username }}</strong>
+          <small>@{{ user.username }}</small>
+        </div>
+      </div>
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-ghost btn-block">Log out</button>
+      </form>
+    </aside>
+
+    <main class="main">
+      {% include "_messages.html" %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+{% else %}
+  <header class="topbar">
+    <a class="brand" href="{% url 'home' %}">
+      <span class="logo" aria-hidden="true"></span>
+      <span>FindAFriend</span>
+    </a>
+    <nav>
+      <a href="{% url 'accounts:login' %}">Log in</a>
+      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Create account</a>
+    </nav>
+  </header>
+  <main class="public">
+    {% include "_messages.html" %}
+    {% block public_content %}{% endblock %}
+  </main>
+{% endif %}
+</body>
+</html>
