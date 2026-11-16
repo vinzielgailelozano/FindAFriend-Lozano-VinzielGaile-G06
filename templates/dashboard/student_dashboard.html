@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard · FindAFriend{% endblock %}
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Student</p>
+      <h1>Hi {{ user.first_name|default:user.username }}, ready to meet someone new?</h1>
+      <p class="muted">{{ user.course|default:"Add your course" }}{% if user.year_level %} · {{ user.get_year_level_display }}{% endif %}{% if user.student_status %} · {{ user.get_student_status_display }}{% endif %}</p>
+    </div>
+  </header>
+
+  <section class="stats stats-3">
+    <div class="stat stat-accent"><span class="stat-label">Students in your course</span><span class="stat-value">{{ same_course_count }}</span></div>
+    <div class="stat"><span class="stat-label">Same course &amp; year</span><span class="stat-value">{{ same_course_year_count }}</span></div>
+    <div class="stat"><span class="stat-label">{% if user.student_status %}Other {{ user.get_student_status_display|lower }} students{% else %}Same student status{% endif %}</span><span class="stat-value">{{ same_status_count }}</span></div>
+  </section>
+
+  <section class="quick-actions">
+    <div class="action action-primary">
+      <h3>Find friends</h3>
+      <p>Search by interests, subjects, course and year level.</p>
+      <span class="badge">Coming soon</span>
+    </div>
+    <div class="action">
+      <h3>Friend requests</h3>
+      <p>Accept or decline people who want to connect.</p>
+      <span class="badge">Coming soon</span>
+    </div>
+    <div class="action">
+      <h3>Messages</h3>
+      <p>Chat with your connections and study buddies.</p>
+      <span class="badge">Coming soon</span>
+    </div>
+  </section>
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-head">
+        <h2>Your profile</h2>
+        <a href="{% url 'accounts:profile_edit' %}">Edit →</a>
+      </div>
+      <div class="progress" aria-label="Profile completion">
+        <div class="progress-bar" style="width: {{ user.profile_completion }}%"></div>
+      </div>
+      <p class="muted">{{ user.profile_completion }}% complete — a fuller profile means better friend matches.</p>
+      {% if user.interest_list %}
+        <div class="tags">{% for tag in user.interest_list %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
+      {% else %}
+        <p>Add your interests and hobbies so others with the same likes can find you.</p>
+      {% endif %}
+    </section>
+    <section class="card">
+      <h2>Stay safe</h2>
+      <p class="muted">FindAFriend is for students of this campus only. You'll be able to block and report anyone who makes you uncomfortable, and admins review every report.</p>
+    </section>
+  </div>
+{% endblock %}
