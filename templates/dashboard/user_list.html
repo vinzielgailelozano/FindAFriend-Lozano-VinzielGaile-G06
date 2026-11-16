@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Users · FindAFriend{% endblock %}
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Users</h1>
+    </div>
+  </header>
+
+  <section class="card">
+    <form method="get" class="filters">
+      <input class="input" type="search" name="q" value="{{ query }}" placeholder="Search name, username, email or course">
+      <select class="input" name="role">
+        <option value="">All roles</option>
+        {% for value, label in roles %}
+          <option value="{{ value }}" {% if role == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary" type="submit">Filter</button>
+    </form>
+
+    <table class="table">
+      <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Course</th><th>Status</th><th>Role</th><th>Joined</th></tr></thead>
+      <tbody>
+        {% for u in users %}
+          <tr>
+            <td>{{ u.get_full_name|default:"—" }}</td>
+            <td>@{{ u.username }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.course|default:"—" }}{% if u.year_level %} · {{ u.year_level }}{% endif %}</td>
+            <td>{{ u.get_student_status_display|default:"—" }}</td>
+            <td><span class="role-chip role-{{ u.role|lower }}">{{ u.get_role_display }}</span></td>
+            <td>{{ u.date_joined|date:"M j, Y" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="muted">No users match your search.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endblock %}
