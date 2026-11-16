@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Log in · FindAFriend{% endblock %}
+{% block public_content %}
+  <section class="auth-card">
+    <h1>Log in</h1>
+    {% if request.GET.next %}
+      <div class="alert alert-warning">Please log in to open that page.</div>
+    {% else %}
+      <p class="muted">Welcome back! Sign in with your username or email.</p>
+    {% endif %}
+    <form method="post" novalidate class="form">
+      {% csrf_token %}
+      {% include "_form_fields.html" %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <button type="submit" class="btn btn-primary btn-block">Log in</button>
+    </form>
+    <p class="auth-switch">New here? <a href="{% url 'accounts:register' %}">Create an account</a></p>
+  </section>
+{% endblock %}
