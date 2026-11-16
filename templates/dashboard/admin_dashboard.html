@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard · FindAFriend{% endblock %}
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Hello, {{ user.first_name|default:user.username }}</h1>
+      <p class="muted">Here's how the FindAFriend community is growing.</p>
+    </div>
+  </header>
+
+  <section class="stats">
+    <div class="stat"><span class="stat-label">Students</span><span class="stat-value">{{ total_students }}</span></div>
+    <div class="stat"><span class="stat-label">Admins</span><span class="stat-value">{{ total_admins }}</span></div>
+    <div class="stat"><span class="stat-label">New this week</span><span class="stat-value">{{ new_this_week }}</span></div>
+    <div class="stat stat-accent"><span class="stat-label">Irregular / transferee / shiftee / exchange</span><span class="stat-value">{{ needs_support }}</span></div>
+  </section>
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-head">
+        <h2>Newest accounts</h2>
+        <a href="{% url 'dashboard:user_list' %}">View all →</a>
+      </div>
+      <table class="table">
+        <thead><tr><th>Name</th><th>Course</th><th>Role</th><th>Joined</th></tr></thead>
+        <tbody>
+          {% for u in recent_users %}
+            <tr>
+              <td>{{ u.get_full_name|default:u.username }}<br><small class="muted">{{ u.email }}</small></td>
+              <td>{{ u.course|default:"—" }}{% if u.year_level %} · {{ u.get_year_level_display }}{% endif %}</td>
+              <td><span class="role-chip role-{{ u.role|lower }}">{{ u.get_role_display }}</span></td>
+              <td>{{ u.date_joined|date:"M j" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="muted">No accounts yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Students by status</h2>
+      <ul class="bars">
+        {% for row in by_status %}
+          <li>
+            <span>{{ row.label }}</span>
+            <strong>{{ row.count }}</strong>
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="coming-soon">
+        <strong>Coming next:</strong> reported users, warnings and moderation tools.
+      </div>
+    </section>
+  </div>
+{% endblock %}
