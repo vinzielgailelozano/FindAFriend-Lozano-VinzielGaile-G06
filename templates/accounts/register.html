@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Create account · FindAFriend{% endblock %}
+{% block public_content %}
+  <section class="auth-card auth-wide">
+    <h1>Create your account</h1>
+    <p class="muted">Join your campus community and start meeting classmates, study buddies and new friends.</p>
+    <form method="post" novalidate class="form form-grid">
+      {% csrf_token %}
+      {% include "_form_fields.html" %}
+      <button type="submit" class="btn btn-primary btn-block span-2">Create account</button>
+    </form>
+    <p class="auth-switch">Already registered? <a href="{% url 'accounts:login' %}">Log in</a></p>
+  </section>
+{% endblock %}
