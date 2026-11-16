@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile · FindAFriend{% endblock %}
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="eyebrow"><a href="{% url 'accounts:profile' %}">My Profile</a> /</p>
+      <h1>Edit profile</h1>
+    </div>
+  </header>
+
+  <section class="card">
+    <div class="profile-top">
+      {% include "accounts/_avatar.html" with u=user size="lg" %}
+      <p class="muted">Upload a JPG or PNG up to 2 MB to change your photo.</p>
+    </div>
+    <form method="post" enctype="multipart/form-data" novalidate class="form form-grid">
+      {% csrf_token %}
+      {% include "_form_fields.html" %}
+      <div class="form-actions span-2">
+        <a class="btn btn-ghost" href="{% url 'accounts:profile' %}">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
