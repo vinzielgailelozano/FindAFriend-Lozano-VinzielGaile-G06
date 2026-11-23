@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Connections · FindAFriend{% endblock %}
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Connections</h1>
+      <p class="muted">All friend requests and friendships between students. Remove spam or reported requests here.</p>
+    </div>
+  </header>
+
+  <section class="stats stats-3">
+    <div class="stat stat-accent"><span class="stat-label">Friendships</span><span class="stat-value">{{ count_friends }}</span></div>
+    <div class="stat"><span class="stat-label">Pending requests</span><span class="stat-value">{{ count_pending }}</span></div>
+    <div class="stat"><span class="stat-label">Declined</span><span class="stat-value">{{ count_declined }}</span></div>
+  </section>
+
+  <section class="card">
+    <form method="get" class="filters">
+      <input class="input" type="search" name="q" value="{{ q }}" placeholder="Search by student name or username">
+      <select class="input" name="status">
+        <option value="">All statuses</option>
+        {% for value, label in statuses %}
+          <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary" type="submit">Filter</button>
+    </form>
+
+    <table class="table">
+      <thead><tr><th>From</th><th>To</th><th>Message</th><th>Status</th><th>Sent</th><th></th></tr></thead>
+      <tbody>
+        {% for fr in page %}
+          <tr>
+            <td>{{ fr.from_user.get_full_name|default:fr.from_user.username }}<br><small class="muted">@{{ fr.from_user.username }}</small></td>
+            <td>{{ fr.to_user.get_full_name|default:fr.to_user.username }}<br><small class="muted">@{{ fr.to_user.username }}</small></td>
+            <td class="msg-cell">{{ fr.message|default:"—"|truncatechars:60 }}</td>
+            <td><span class="status-pill status-{{ fr.status|lower }}">{{ fr.get_status_display }}</span></td>
+            <td>{{ fr.created_at|date:"M j, Y" }}</td>
+            <td><a class="btn btn-sm btn-danger" href="{% url 'friends:admin_connection_delete' fr.pk %}">Remove</a></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="muted">No connections found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if page.has_other_pages %}
+      <nav class="pagination" aria-label="Pages">
+        {% if page.has_previous %}<a class="btn btn-sm btn-ghost" href="?q={{ q|urlencode }}&status={{ status }}&page={{ page.previous_page_number }}">← Previous</a>{% endif %}
+        <span class="muted">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+        {% if page.has_next %}<a class="btn btn-sm btn-ghost" href="?q={{ q|urlencode }}&status={{ status }}&page={{ page.next_page_number }}">Next →</a>{% endif %}
+      </nav>
+    {% endif %}
+  </section>
+{% endblock %}
