@@ -25,13 +25,15 @@
         {% if user.role == "ADMIN" %}
           <a href="{% url 'dashboard:admin' %}" class="{% if url_name == 'admin' %}active{% endif %}">Dashboard</a>
           <a href="{% url 'dashboard:user_list' %}" class="{% if url_name == 'user_list' %}active{% endif %}">Users</a>
+          <a href="{% url 'friends:admin_connections' %}" class="{% if url_name == 'admin_connections' or url_name == 'admin_connection_delete' %}active{% endif %}">Connections</a>
           <span class="nav-soon">Reports <em>soon</em></span>
           <span class="nav-soon">Moderation <em>soon</em></span>
           <a href="{% url 'admin:index' %}">Django Admin</a>
         {% else %}
           <a href="{% url 'dashboard:student' %}" class="{% if url_name == 'student' %}active{% endif %}">Dashboard</a>
-          <a href="{% url 'friends:student_list' %}" class="{% if url_name == 'student_list' or url_name == 'student_detail' %}active{% endif %}">Find Friends</a>
-          <span class="nav-soon">Friend Requests <em>soon</em></span>
+          <a href="{% url 'friends:student_list' %}" class="{% if url_name == 'student_list' or url_name == 'student_detail' or url_name == 'send_request' %}active{% endif %}">Find Friends</a>
+          <a href="{% url 'friends:request_list' %}" class="{% if url_name == 'request_list' or url_name == 'request_edit' or url_name == 'request_cancel' %}active{% endif %}">Friend Requests{% if pending_request_count %} <span class="count">{{ pending_request_count }}</span>{% endif %}</a>
+          <a href="{% url 'friends:friend_list' %}" class="{% if url_name == 'friend_list' or url_name == 'unfriend' %}active{% endif %}">My Friends</a>
           <span class="nav-soon">Messages <em>soon</em></span>
           <span class="nav-soon">Groups <em>soon</em></span>
         {% endif %}

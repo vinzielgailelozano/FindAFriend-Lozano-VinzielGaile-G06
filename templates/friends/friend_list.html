@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}My Friends · FindAFriend{% endblock %}
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">My Friends</p>
+      <h1>{{ friends|length }} friend{{ friends|length|pluralize }}</h1>
+    </div>
+    <form method="get" class="inline-search">
+      <input class="input" type="search" name="q" value="{{ q }}" placeholder="Search your friends">
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+  </header>
+
+  {% if friends %}
+    <section class="student-grid">
+      {% for s in friends %}
+        <article class="student-card">
+          <a class="student-card-top" href="{% url 'friends:student_detail' s.pk %}">
+            {% include "accounts/_avatar.html" with u=s size="md" %}
+            <div>
+              <h3>{{ s.get_full_name|default:s.username }}</h3>
+              <p class="muted">{{ s.course|default:"Course not set" }}{% if s.year_level %} · {{ s.get_year_level_display }}{% endif %}</p>
+            </div>
+          </a>
+          {% if s.contact_number %}<p class="small">📱 {{ s.contact_number }}</p>{% endif %}
+          <div class="student-card-actions">
+            <a class="btn btn-sm btn-ghost" href="{% url 'friends:student_detail' s.pk %}">View profile</a>
+            <a class="btn btn-sm btn-danger" href="{% url 'friends:unfriend' s.pk %}">Unfriend</a>
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+  {% else %}
+    <section class="card empty-state">
+      {% if q %}
+        <h2>No friends match “{{ q }}”</h2>
+        <a class="btn btn-ghost" href="{% url 'friends:friend_list' %}">Show all friends</a>
+      {% else %}
+        <h2>No friends yet</h2>
+        <p class="muted">Find classmates and study buddies who share your interests.</p>
+        <a class="btn btn-primary" href="{% url 'friends:student_list' %}">Find friends</a>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

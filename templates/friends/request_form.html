@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Edit Request · FindAFriend{% endblock %}
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="eyebrow"><a href="{% url 'friends:request_list' %}">Friend Requests</a> /</p>
+      <h1>Edit your message</h1>
+      <p class="muted">To {{ friend_request.to_user.get_full_name|default:friend_request.to_user.username }}</p>
+    </div>
+  </header>
+  <section class="card narrow">
+    <form method="post" class="form" novalidate>
+      {% csrf_token %}
+      {% include "_form_fields.html" %}
+      <div class="form-actions">
+        <a class="btn btn-ghost" href="{% url 'friends:request_list' %}">Back</a>
+        <button class="btn btn-primary" type="submit">Save message</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
