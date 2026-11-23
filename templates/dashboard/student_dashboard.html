@@ -9,10 +9,11 @@
     </div>
   </header>
 
-  <section class="stats stats-3">
-    <div class="stat stat-accent"><span class="stat-label">Students in your course</span><span class="stat-value">{{ same_course_count }}</span></div>
-    <div class="stat"><span class="stat-label">Same course &amp; year</span><span class="stat-value">{{ same_course_year_count }}</span></div>
-    <div class="stat"><span class="stat-label">{% if user.student_status %}Other {{ user.get_student_status_display|lower }} students{% else %}Same student status{% endif %}</span><span class="stat-value">{{ same_status_count }}</span></div>
+  <section class="stats">
+    <a class="stat stat-link stat-accent" href="{% url 'friends:friend_list' %}"><span class="stat-label">Friends</span><span class="stat-value">{{ friend_count }}</span></a>
+    <a class="stat stat-link" href="{% url 'friends:request_list' %}"><span class="stat-label">Requests waiting for you</span><span class="stat-value">{{ received_count }}</span></a>
+    <a class="stat stat-link" href="{% url 'friends:request_list' %}"><span class="stat-label">Requests you sent</span><span class="stat-value">{{ sent_count }}</span></a>
+    <a class="stat stat-link" href="{% url 'friends:student_list' %}?course={{ user.course|urlencode }}"><span class="stat-label">Students in your course</span><span class="stat-value">{{ same_course_count }}</span></a>
   </section>
 
   <section class="quick-actions">
@@ -21,11 +22,11 @@
       <p>Search by interests, course, year level and status.</p>
       <span class="link">Search →</span>
     </a>
-    <div class="action">
+    <a class="action" href="{% url 'friends:request_list' %}">
       <h3>Friend requests</h3>
       <p>Accept or decline people who want to connect.</p>
-      <span class="badge">Coming soon</span>
-    </div>
+      <span class="link">{% if received_count %}{{ received_count }} waiting →{% else %}Open →{% endif %}</span>
+    </a>
     <div class="action">
       <h3>Messages</h3>
       <p>Chat with your connections and study buddies.</p>
@@ -34,6 +35,25 @@
   </section>
 
   <div class="grid-2">
+    <section class="card">
+      <div class="card-head">
+        <h2>Suggested for you</h2>
+        <a href="{% url 'friends:student_list' %}">See all →</a>
+      </div>
+      {% for s in suggestions %}
+        <a class="suggestion" href="{% url 'friends:student_detail' s.pk %}">
+          {% include "accounts/_avatar.html" with u=s size="sm" %}
+          <div>
+            <strong>{{ s.get_full_name|default:s.username }}</strong>
+            <small class="muted">{{ s.course|default:"Course not set" }}{% if s.year_level %} · {{ s.get_year_level_display }}{% endif %}</small>
+          </div>
+          <span class="btn btn-sm btn-primary">Add</span>
+        </a>
+      {% empty %}
+        <p class="muted">No suggestions right now. Check back when more students join!</p>
+      {% endfor %}
+    </section>
+
     <section class="card">
       <div class="card-head">
         <h2>Your profile</h2>
@@ -48,10 +68,6 @@
       {% else %}
         <p>Add your interests and hobbies so others with the same likes can find you.</p>
       {% endif %}
-    </section>
-    <section class="card">
-      <h2>Stay safe</h2>
-      <p class="muted">FindAFriend is for students of this campus only. You'll be able to block and report anyone who makes you uncomfortable, and admins review every report.</p>
     </section>
   </div>
 {% endblock %}
