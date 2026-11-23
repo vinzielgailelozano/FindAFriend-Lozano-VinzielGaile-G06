@@ -8,28 +8,74 @@
     </div>
   </header>
 
-  <section class="card profile-card">
-    <div class="profile-top">
-      {% include "accounts/_avatar.html" with u=student size="lg" %}
-      <div>
-        <h2>{{ student.get_full_name|default:student.username }}</h2>
-        <p class="muted">@{{ student.username }}</p>
-        {% if student.student_status %}<span class="status-chip">{{ student.get_student_status_display }}</span>{% endif %}
+  <div class="grid-2">
+    <section class="card profile-card">
+      <div class="profile-top">
+        {% include "accounts/_avatar.html" with u=student size="lg" %}
+        <div>
+          <h2>{{ student.get_full_name|default:student.username }}</h2>
+          <p class="muted">@{{ student.username }}</p>
+          {% if student.student_status %}<span class="status-chip">{{ student.get_student_status_display }}</span>{% endif %}
+        </div>
       </div>
-    </div>
-    <dl class="details">
-      <div><dt>Course / program</dt><dd>{{ student.course|default:"Not set" }}</dd></div>
-      <div><dt>Year level</dt><dd>{{ student.get_year_level_display|default:"Not set" }}</dd></div>
-    </dl>
-    <div class="profile-extra">
-      <h3>About</h3>
-      <p>{{ student.bio|default:"No bio yet."|linebreaksbr }}</p>
-      <h3>Interests &amp; hobbies</h3>
-      {% if student.interest_list %}
-        <div class="tags">{% for tag in student.interest_list %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
+      <dl class="details">
+        <div><dt>Course / program</dt><dd>{{ student.course|default:"Not set" }}</dd></div>
+        <div><dt>Year level</dt><dd>{{ student.get_year_level_display|default:"Not set" }}</dd></div>
+        {% if state == "friends" %}
+          <div><dt>Email</dt><dd>{{ student.email }}</dd></div>
+          <div><dt>Contact number</dt><dd>{{ student.contact_number|default:"Not set" }}</dd></div>
+        {% endif %}
+      </dl>
+      <div class="profile-extra">
+        <h3>About</h3>
+        <p>{{ student.bio|default:"No bio yet."|linebreaksbr }}</p>
+        <h3>Interests &amp; hobbies</h3>
+        {% if student.interest_list %}
+          <div class="tags">{% for tag in student.interest_list %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
+        {% else %}
+          <p class="muted">None added yet.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="card">
+      {% if state == "friends" %}
+        <h2>You're friends ✓</h2>
+        <p class="muted">Since {{ friend_request.responded_at|default:friend_request.created_at|date:"F j, Y" }}. Their email and contact number are now visible to you.</p>
+        <a class="btn btn-ghost" href="{% url 'friends:unfriend' student.pk %}">Unfriend</a>
+
+      {% elif state == "sent" %}
+        <h2>Request sent</h2>
+        <p class="muted">Sent {{ friend_request.created_at|timesince }} ago. Waiting for {{ student.first_name|default:student.username }} to answer.</p>
+        {% if friend_request.message %}<blockquote class="request-message">“{{ friend_request.message }}”</blockquote>{% endif %}
+        <div class="form-actions start">
+          <a class="btn btn-ghost" href="{% url 'friends:request_edit' friend_request.pk %}">Edit message</a>
+          <a class="btn btn-danger" href="{% url 'friends:request_cancel' friend_request.pk %}">Cancel request</a>
+        </div>
+
+      {% elif state == "received" %}
+        <h2>{{ student.first_name|default:student.username }} wants to be friends</h2>
+        {% if friend_request.message %}<blockquote class="request-message">“{{ friend_request.message }}”</blockquote>{% endif %}
+        <div class="form-actions start">
+          <form method="post" action="{% url 'friends:respond_request' friend_request.pk 'accept' %}">
+            {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+            <button class="btn btn-primary" type="submit">Accept</button>
+          </form>
+          <form method="post" action="{% url 'friends:respond_request' friend_request.pk 'decline' %}">
+            {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+            <button class="btn btn-ghost" type="submit">Decline</button>
+          </form>
+        </div>
+
       {% else %}
-        <p class="muted">None added yet.</p>
+        <h2>Send a friend request</h2>
+        <p class="muted">Say hi and mention what you have in common.</p>
+        <form method="post" action="{% url 'friends:send_request' student.pk %}" class="form" novalidate>
+          {% csrf_token %}
+          {% include "_form_fields.html" %}
+          <button class="btn btn-primary" type="submit">Send friend request</button>
+        </form>
       {% endif %}
-    </div>
-  </section>
+    </section>
+  </div>
 {% endblock %}

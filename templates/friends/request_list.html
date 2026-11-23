@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Friend Requests · FindAFriend{% endblock %}
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Friend Requests</p>
+      <h1>Your requests</h1>
+    </div>
+    <a class="btn btn-primary" href="{% url 'friends:student_list' %}">Find more friends</a>
+  </header>
+
+  <div class="grid-2 even">
+    <section class="card">
+      <div class="card-head"><h2>Received</h2><span class="pill">{{ received|length }}</span></div>
+      {% for fr in received %}
+        <div class="request-item">
+          <a class="request-who" href="{% url 'friends:student_detail' fr.from_user.pk %}">
+            {% include "accounts/_avatar.html" with u=fr.from_user size="sm" %}
+            <div>
+              <strong>{{ fr.from_user.get_full_name|default:fr.from_user.username }}</strong>
+              <small class="muted">{{ fr.from_user.course|default:"" }} · {{ fr.created_at|timesince }} ago</small>
+            </div>
+          </a>
+          {% if fr.message %}<blockquote class="request-message">“{{ fr.message }}”</blockquote>{% endif %}
+          <div class="form-actions start">
+            <form method="post" action="{% url 'friends:respond_request' fr.pk 'accept' %}">
+              {% csrf_token %}<button class="btn btn-sm btn-primary" type="submit">Accept</button>
+            </form>
+            <form method="post" action="{% url 'friends:respond_request' fr.pk 'decline' %}">
+              {% csrf_token %}<button class="btn btn-sm btn-ghost" type="submit">Decline</button>
+            </form>
+          </div>
+        </div>
+      {% empty %}
+        <p class="muted empty-line">No requests waiting for you.</p>
+      {% endfor %}
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Sent</h2><span class="pill">{{ sent|length }}</span></div>
+      {% for fr in sent %}
+        <div class="request-item">
+          <a class="request-who" href="{% url 'friends:student_detail' fr.to_user.pk %}">
+            {% include "accounts/_avatar.html" with u=fr.to_user size="sm" %}
+            <div>
+              <strong>{{ fr.to_user.get_full_name|default:fr.to_user.username }}</strong>
+              <small class="muted">Sent {{ fr.created_at|timesince }} ago</small>
+            </div>
+          </a>
+          {% if fr.message %}<blockquote class="request-message">“{{ fr.message }}”</blockquote>{% endif %}
+          <div class="form-actions start">
+            <a class="btn btn-sm btn-ghost" href="{% url 'friends:request_edit' fr.pk %}">Edit message</a>
+            <a class="btn btn-sm btn-danger" href="{% url 'friends:request_cancel' fr.pk %}">Cancel</a>
+          </div>
+        </div>
+      {% empty %}
+        <p class="muted empty-line">You have no pending sent requests.</p>
+      {% endfor %}
+    </section>
+  </div>
+{% endblock %}

@@ -16,6 +16,11 @@
     <div class="stat stat-accent"><span class="stat-label">Irregular / transferee / shiftee / exchange</span><span class="stat-value">{{ needs_support }}</span></div>
   </section>
 
+  <section class="stats stats-2">
+    <a class="stat stat-link" href="{% url 'friends:admin_connections' %}?status=ACCEPTED"><span class="stat-label">Friendships made</span><span class="stat-value">{{ total_friendships }}</span></a>
+    <a class="stat stat-link" href="{% url 'friends:admin_connections' %}?status=PENDING"><span class="stat-label">Pending friend requests</span><span class="stat-value">{{ total_pending }}</span></a>
+  </section>
+
   <div class="grid-2">
     <section class="card">
       <div class="card-head">
@@ -49,8 +54,36 @@
           </li>
         {% endfor %}
       </ul>
+    </section>
+  </div>
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-head">
+        <h2>Latest friend activity</h2>
+        <a href="{% url 'friends:admin_connections' %}">View all →</a>
+      </div>
+      <table class="table">
+        <thead><tr><th>From</th><th>To</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for fr in recent_connections %}
+            <tr>
+              <td>@{{ fr.from_user.username }}</td>
+              <td>@{{ fr.to_user.username }}</td>
+              <td><span class="status-pill status-{{ fr.status|lower }}">{{ fr.get_status_display }}</span></td>
+              <td>{{ fr.created_at|date:"M j" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="muted">No friend requests yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    <section class="card">
+      <h2>Moderation</h2>
+      <p class="muted">Open <a href="{% url 'friends:admin_connections' %}">Connections</a> to search all requests and remove spam or reported ones.</p>
       <div class="coming-soon">
-        <strong>Coming next:</strong> reported users, warnings and moderation tools.
+        <strong>Coming next:</strong> student reports, warnings and blocking.
       </div>
     </section>
   </div>
