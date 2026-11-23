@@ -8,6 +8,8 @@ from django.views.decorators.cache import never_cache
 
 from accounts.decorators import role_required
 from accounts.models import User
+from friends import services as friend_services
+from friends.models import FriendRequest
 
 
 @never_cache
@@ -39,6 +41,9 @@ def admin_dashboard(request):
         "needs_support": students.exclude(student_status__in=["", User.StudentStatus.REGULAR]).count(),
         "by_status": by_status,
         "recent_users": User.objects.order_by("-date_joined")[:5],
+        "total_friendships": FriendRequest.objects.filter(status=FriendRequest.Status.ACCEPTED).count(),
+        "total_pending": FriendRequest.objects.filter(status=FriendRequest.Status.PENDING).count(),
+        "recent_connections": FriendRequest.objects.select_related("from_user", "to_user")[:5],
     }
     return render(request, "dashboard/admin_dashboard.html", context)
 
@@ -72,9 +77,23 @@ def student_dashboard(request):
     me = request.user
     others = User.objects.filter(role=User.Role.STUDENT, is_active=True).exclude(pk=me.pk)
     same_course = others.filter(course__iexact=me.course) if me.course else others.none()
+
+    # Suggestions: same course first, skipping friends and pending requests.
+    connected = friend_services.friend_ids(me) | set(
+        FriendRequest.objects.filter(from_user=me, status=FriendRequest.Status.PENDING).values_list("to_user_id", flat=True)
+    ) | set(
+        FriendRequest.objects.filter(to_user=me, status=FriendRequest.Status.PENDING).values_list("from_user_id", flat=True)
+    )
+    suggestions = list(same_course.exclude(pk__in=connected)[:3])
+    if len(suggestions) < 3:
+        extra = others.exclude(pk__in=connected).exclude(pk__in=[s.pk for s in suggestions]).order_by("-date_joined")
+        suggestions += list(extra[: 3 - len(suggestions)])
+
     context = {
+        "friend_count": len(friend_services.friend_ids(me)),
+        "received_count": FriendRequest.objects.filter(to_user=me, status=FriendRequest.Status.PENDING).count(),
+        "sent_count": FriendRequest.objects.filter(from_user=me, status=FriendRequest.Status.PENDING).count(),
         "same_course_count": same_course.count(),
-        "same_course_year_count": same_course.filter(year_level=me.year_level).count() if me.year_level else 0,
-        "same_status_count": others.filter(student_status=me.student_status).count() if me.student_status else 0,
+        "suggestions": suggestions,
     }
     return render(request, "dashboard/student_dashboard.html", context)
