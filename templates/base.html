@@ -30,7 +30,7 @@
           <a href="{% url 'admin:index' %}">Django Admin</a>
         {% else %}
           <a href="{% url 'dashboard:student' %}" class="{% if url_name == 'student' %}active{% endif %}">Dashboard</a>
-          <span class="nav-soon">Find Friends <em>soon</em></span>
+          <a href="{% url 'friends:student_list' %}" class="{% if url_name == 'student_list' or url_name == 'student_detail' %}active{% endif %}">Find Friends</a>
           <span class="nav-soon">Friend Requests <em>soon</em></span>
           <span class="nav-soon">Messages <em>soon</em></span>
           <span class="nav-soon">Groups <em>soon</em></span>
