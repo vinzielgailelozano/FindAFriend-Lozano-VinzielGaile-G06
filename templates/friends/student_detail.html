@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ student.get_full_name|default:student.username }} · FindAFriend{% endblock %}
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="eyebrow"><a href="{% url 'friends:student_list' %}">Find Friends</a> /</p>
+      <h1>{{ student.get_full_name|default:student.username }}</h1>
+    </div>
+  </header>
+
+  <section class="card profile-card">
+    <div class="profile-top">
+      {% include "accounts/_avatar.html" with u=student size="lg" %}
+      <div>
+        <h2>{{ student.get_full_name|default:student.username }}</h2>
+        <p class="muted">@{{ student.username }}</p>
+        {% if student.student_status %}<span class="status-chip">{{ student.get_student_status_display }}</span>{% endif %}
+      </div>
+    </div>
+    <dl class="details">
+      <div><dt>Course / program</dt><dd>{{ student.course|default:"Not set" }}</dd></div>
+      <div><dt>Year level</dt><dd>{{ student.get_year_level_display|default:"Not set" }}</dd></div>
+    </dl>
+    <div class="profile-extra">
+      <h3>About</h3>
+      <p>{{ student.bio|default:"No bio yet."|linebreaksbr }}</p>
+      <h3>Interests &amp; hobbies</h3>
+      {% if student.interest_list %}
+        <div class="tags">{% for tag in student.interest_list %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
+      {% else %}
+        <p class="muted">None added yet.</p>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}
