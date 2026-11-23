@@ -1,0 +1,17 @@
+{# One student in a grid. Needs: s (User) #}
+<article class="student-card">
+  <a class="student-card-top" href="{% url 'friends:student_detail' s.pk %}">
+    {% include "accounts/_avatar.html" with u=s size="md" %}
+    <div>
+      <h3>{{ s.get_full_name|default:s.username }}</h3>
+      <p class="muted">{{ s.course|default:"Course not set" }}{% if s.year_level %} · {{ s.get_year_level_display }}{% endif %}</p>
+    </div>
+  </a>
+  {% if s.student_status %}<span class="status-chip">{{ s.get_student_status_display }}</span>{% endif %}
+  {% if s.interest_list %}
+    <div class="tags">{% for tag in s.interest_list|slice:":4" %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
+  {% endif %}
+  <div class="student-card-actions">
+    <a class="btn btn-sm btn-primary" href="{% url 'friends:student_detail' s.pk %}">View profile</a>
+  </div>
+</article>
