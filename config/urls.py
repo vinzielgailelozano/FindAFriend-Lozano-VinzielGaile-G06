@@ -9,6 +9,7 @@ urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("dashboard/", include("dashboard.urls")),
+    path("friends/", include("friends.urls")),
 ]
 
 if settings.DEBUG:
